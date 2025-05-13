@@ -41,7 +41,6 @@ const HomePage = () => {
 
     if (requests && Array.isArray(requests) && requests.length > 0) {
       requests.forEach((req) => {
-        console.log("🚀 ~ outgoingFriendRequests.forEach ~ req:", req);
         outgoingIds.add(req.recipient?._id);
       });
       setOutgoingRequestsIds(outgoingIds);
@@ -67,7 +66,7 @@ const HomePage = () => {
           <NoFriendsFound />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {friends.map((friend) => (
+            {friends?.friends.map((friend) => (
               <FriendCard key={friend._id} friend={friend} />
             ))}
           </div>

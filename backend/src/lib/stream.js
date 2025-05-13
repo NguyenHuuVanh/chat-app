@@ -18,8 +18,9 @@ const upsertStreamUser = async (userData) => {
   }
 };
 
-const generateStreamToken = async (userId) => {
+const generateStreamToken = (userId) => {
   try {
+    // ensure userId is a string
     const userIdString = userId.toString();
     return streamClient.createToken(userIdString);
   } catch (error) {

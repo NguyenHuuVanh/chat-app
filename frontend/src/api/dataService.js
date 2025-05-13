@@ -56,7 +56,12 @@ const getFriendRequests = async () => {
 };
 
 const acceptFriendRequest = async (requestId) => {
-  const res = await axiosInstance.get(`/users/friend-request/${requestId}/accept`);
+  const res = await axiosInstance.put(`/users/friend-request/${requestId}/accept`);
+  return res.data;
+};
+
+const getStreamToken = async () => {
+  const res = await axiosInstance.get("/chat/token");
   return res.data;
 };
 
@@ -72,4 +77,5 @@ export {
   sendFriendRequest,
   getFriendRequests,
   acceptFriendRequest,
+  getStreamToken,
 };

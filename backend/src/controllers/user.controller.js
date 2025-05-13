@@ -32,7 +32,7 @@ const getMyFriends = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
       .select("friends")
-      .populate("friends", "fullName profilePicture nativeLanguage learningLanguag");
+      .populate("friends", "fullName profilePicture nativeLanguage learningLanguage");
     res.status(200).json({
       success: true,
       message: "Friends fetched successfully",

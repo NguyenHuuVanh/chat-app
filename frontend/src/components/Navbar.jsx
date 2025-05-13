@@ -29,7 +29,7 @@ const Navbar = () => {
           )}
 
           {/* BELL ICON */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 ml-auto">
             <Link to="/notifications">
               <button className="btn btn-ghost btn-circle hover:bg-white/20 hover:text-primary">
                 <BellIcon className="h-6 w-6 text-base-content opacity-70" />
