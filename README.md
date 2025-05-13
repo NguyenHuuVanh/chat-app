@@ -1,6 +1,6 @@
 # React + Vite
 
-# Streamify - Language Learning Chat Application
+# chatapp - Language Learning Chat Application
 
 # Overview
 
