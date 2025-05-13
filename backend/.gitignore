@@ -28,6 +28,6 @@ yarn-error.log*
 #data control
 dataControl.json
 
-# .vercel
-vercel.json
+# # .vercel
+# vercel.json
 
