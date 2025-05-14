@@ -75,21 +75,11 @@ const login = async (req, res) => {
     if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid password" });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
-
-    // res.cookie("jwt", token, {
-    //   maxAge: 7 * 24 * 60 * 60 * 1000,
-    //   httpOnly: true, // prevent XSS attacks
-    //   sameSite: "strict", // prevent CSRF attacks
-    //   secure: process.env.NODE_ENV === "production", // prevent HTTP requests
-    // });
-
     res.cookie("jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+      httpOnly: true, // prevent XSS attacks
+      sameSite: "strict", // prevent CSRF attacks
+      secure: process.env.NODE_ENV === "production", // prevent HTTP requests
     });
 
     res.status(200).json({ success: true, message: "User logged in successfully", user });
