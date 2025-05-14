@@ -12,15 +12,26 @@ import { connectDB } from "./lib/db.js";
 const app = express();
 const PORT = process.env.PORT;
 
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "*", // Hoặc cấu hình chính xác domain frontend của bạn
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.get("/", (req, res) => {
+  res.status(200).send("API is running...");
+});
 
 // Routes
 app.use("/api/auth", authRoutes);
