@@ -1,9 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
-
 const axiosInstance = axios.create({
-  baseURL: BASE_URL, // Use environment variable for base URL
+  baseURL: import.meta.env.VITE_API_URL, // Use the environment variable for the base URL
   withCredentials: true, // This is important for sending cookies with requests
 });
 

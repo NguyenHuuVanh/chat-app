@@ -4,10 +4,21 @@
   "description": "Streamify is a full-stack language learning application that connects users with language exchange partners worldwide. The platform enables users to practice conversations, make friends, and improve their language skills through real-time chat and video calls.",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "npm run start --prefix backend"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "install-all": "npm run install-backend && npm run install-frontend",
+    "build-frontend": "cd frontend && npm run build",
+    "start-backend": "cd backend && npm start",
+    "dev-backend": "cd backend && npm run dev",
+    "dev-frontend": "cd frontend && npm run dev",
+    "build": "npm run install-all && npm run build-frontend",
+    "start": "npm run start-backend"
   },
-  "keywords": [],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["chat", "language learning", "realtime", "stream", "video calls"],
   "author": "",
   "license": "ISC"
 }
