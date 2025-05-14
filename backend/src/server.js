@@ -22,14 +22,14 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.status(200).send("API is running...");
-});
-
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
+
+app.get("/", (req, res) => {
+  res.status(200).send("API is running...");
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
