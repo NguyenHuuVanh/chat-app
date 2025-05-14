@@ -12,16 +12,9 @@ import { connectDB } from "./lib/db.js";
 const app = express();
 const PORT = process.env.PORT;
 
-// app.use(
-//   cors({
-//     origin: "http://localhost:5173",
-//     credentials: true,
-//   })
-// );
-
 app.use(
   cors({
-    origin: "*", // Hoặc cấu hình chính xác domain frontend của bạn
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
