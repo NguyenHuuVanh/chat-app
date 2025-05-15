@@ -13,6 +13,7 @@ const axiosInstance = axios.create({
   withCredentials: true, // This is important for sending cookies with requests
   headers: {
     "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
