@@ -5,9 +5,25 @@ const signup = async (signupData) => {
   return res.data;
 };
 
+// const login = async (loginData) => {
+//   const res = await axiosInstance.post("/auth/login", loginData);
+//   return res.data;
+// };
+
 const login = async (loginData) => {
-  const res = await axiosInstance.post("/auth/login", loginData);
-  return res.data;
+  try {
+    const res = await axiosInstance.post("/auth/login", loginData);
+
+    // Lưu token vào localStorage nếu có
+    if (res.data && res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+
+    return res.data;
+  } catch (error) {
+    console.error("Login error:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
 const logout = async () => {
@@ -15,12 +31,44 @@ const logout = async () => {
   return res.data;
 };
 
+// const getAuthUser = async () => {
+//   try {
+//     const res = await axiosInstance.get("/auth/me");
+//     return res.data;
+//   } catch (error) {
+//     console.log("Error fetching auth user:", error);
+//     return null; // Handle error gracefully
+//   }
+// };
+
 const getAuthUser = async () => {
   try {
-    const res = await axiosInstance.get("/auth/me");
+    // Lấy token từ localStorage
+    const token = localStorage.getItem("token");
+
+    // Nếu không có token, trả về null luôn
+    if (!token) {
+      console.log("No token found, user not authenticated");
+      return null;
+    }
+
+    // Gọi API với token trong header
+    const res = await axiosInstance.get("/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     return res.data;
   } catch (error) {
     console.log("Error fetching auth user:", error);
+
+    // Nếu lỗi 401, xóa token không hợp lệ
+    if (error.response && error.response.status === 401) {
+      console.log("Token invalid or expired, clearing localStorage");
+      localStorage.removeItem("token");
+    }
+
     return null; // Handle error gracefully
   }
 };
