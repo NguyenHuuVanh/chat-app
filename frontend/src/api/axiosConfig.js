@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const BASEURL =
-  import.meta.env.MODE === "production" ? "https://chat-app-server-alpha-six.vercel.app" : "http://localhost:5001";
+  import.meta.env.MODE === "production"
+    ? "https://chat-app-server-alpha-six.vercel.app/api"
+    : "http://localhost:5001/api";
 
 const axiosInstance = axios.create({
   // baseURL: import.meta.env.VITE_API_URL, // Use the environment variable for the base URL
