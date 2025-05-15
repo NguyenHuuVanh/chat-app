@@ -5,7 +5,8 @@ import axios from "axios";
 //     ? `${import.meta.env.VITE_API_URL}/api`
 //     : "https://chat-app-1-6dz2.onrender.com/api";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5001/api" : `${import.meta.env.VITE_API_URL}/api`;
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL, // Use the environment variable for the base URL
