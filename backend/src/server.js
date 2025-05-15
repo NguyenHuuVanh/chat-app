@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    credentials: true,
+    withCredentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
@@ -33,7 +33,11 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
+  console.log("MONGO_URI=", process.env.MONGODB_URI);
+  console.log("JWT_SECRET=", process.env.JWT_SECRET_KEY);
+  console.log("FRONTEND_URL=", process.env.FRONTEND_URL);
   console.log(`Server is running on port ${PORT}`);
+
   connectDB();
 });
 
