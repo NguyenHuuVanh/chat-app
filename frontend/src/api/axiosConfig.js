@@ -1,12 +1,14 @@
 import axios from "axios";
 
-const BASEURL =
-  import.meta.env.MODE === "production"
-    ? `${import.meta.env.VITE_API_URL}/api`
-    : "https://chat-app-1-6dz2.onrender.com/api";
+// const BASEURL =
+//   import.meta.env.MODE === "production"
+//     ? `${import.meta.env.VITE_API_URL}/api`
+//     : "https://chat-app-1-6dz2.onrender.com/api";
+
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001/api" : "/api";
 
 const axiosInstance = axios.create({
-  baseURL: BASEURL, // Use the environment variable for the base URL
+  baseURL: BASE_URL, // Use the environment variable for the base URL
   withCredentials: true, // This is important for sending cookies with requests
   headers: {
     "Content-Type": "application/json",
