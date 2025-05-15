@@ -82,7 +82,7 @@ const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production", // prevent HTTP requests
     });
 
-    res.status(200).json({ success: true, message: "User logged in successfully", user });
+    res.status(200).json({ success: true, message: "User logged in successfully", user, token });
   } catch (error) {
     console.log("Error in login controller:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
