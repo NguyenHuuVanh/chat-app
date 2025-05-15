@@ -10,19 +10,6 @@ const LoginPage = () => {
     password: "",
   });
 
-  // const queryClient = useQueryClient();
-  // const {
-  //   mutate: loginMutation,
-  //   isPending,
-  //   error,
-  // } = useMutation({
-  //   mutationFn: login,
-  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-  //   onError: () => {
-  //     console.error("Error logging in:", error);
-  //   },
-  // });
-
   const { isPending, error, loginMutation } = useLogin();
 
   const handleChangeLogin = (e) => {
