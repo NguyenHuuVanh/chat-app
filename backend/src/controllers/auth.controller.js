@@ -60,32 +60,96 @@ const signup = async (req, res) => {
   }
 };
 
+// const login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     if (!email || !password) {
+//       return res.status(400).json({ message: "Please fill all fields" });
+//     }
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(401).json({ message: "Invalid email" });
+//     }
+
+//     const isPasswordCorrect = await user.matchPassword(password);
+//     if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid password" });
+
+//     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
+//     res.cookie("jwt", token, {
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//       httpOnly: true, // prevent XSS attacks
+//       sameSite: "strict", // prevent CSRF attacks
+//       secure: process.env.NODE_ENV === "production", // prevent HTTP requests
+//     });
+
+//     res.status(200).json({ success: true, message: "User logged in successfully", user });
+//   } catch (error) {
+//     console.log("Error in login controller:", error.message);
+//     res.status(500).json({ success: false, message: "Internal server error" });
+//   }
+// };
+
 const login = async (req, res) => {
   try {
+    console.log("Login attempt with:", { email: req.body.email });
+
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid email" });
     }
 
-    const isPasswordCorrect = await user.matchPassword(password);
-    if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid password" });
+    console.log("User found:", user._id);
 
+    try {
+      const isPasswordCorrect = await user.matchPassword(password);
+      if (!isPasswordCorrect) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+    } catch (passwordError) {
+      console.error("Password verification error:", passwordError);
+      return res.status(500).json({
+        success: false,
+        message: "Error verifying password",
+        error: passwordError.message,
+      });
+    }
+
+    // Token generation
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true, // prevent XSS attacks
-      sameSite: "strict", // prevent CSRF attacks
-      secure: process.env.NODE_ENV === "production", // prevent HTTP requests
-    });
 
-    res.status(200).json({ success: true, message: "User logged in successfully", user });
+    // Cookie setting
+    try {
+      res.cookie("jwt", token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        secure: process.env.NODE_ENV === "production",
+      });
+    } catch (cookieError) {
+      console.error("Cookie error:", cookieError);
+      // Continue even if cookie setting fails
+    }
+
+    // Send token in response body as fallback
+    res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      user,
+      token,
+    });
   } catch (error) {
-    console.log("Error in login controller:", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Full login error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message, // Add error details in response
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
   }
 };
 
