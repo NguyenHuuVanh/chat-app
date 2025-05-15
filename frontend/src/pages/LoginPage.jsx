@@ -1,31 +1,29 @@
 import { useState } from "react";
-// import useAuthUser from "../hooks/useAuthUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { login } from "../api/dataService";
 import { ShipWheelIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import images from "../assets/images";
+import useLogin from "../hooks/useLogin";
 
 const LoginPage = () => {
-  // const { isLoading, authUser } = useAuthUser();
-
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
 
-  const queryClient = useQueryClient();
-  const {
-    mutate: loginMutation,
-    isPending,
-    error,
-  } = useMutation({
-    mutationFn: login,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-    onError: () => {
-      console.error("Error logging in:", error);
-    },
-  });
+  // const queryClient = useQueryClient();
+  // const {
+  //   mutate: loginMutation,
+  //   isPending,
+  //   error,
+  // } = useMutation({
+  //   mutationFn: login,
+  //   onSuccess: () => queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+  //   onError: () => {
+  //     console.error("Error logging in:", error);
+  //   },
+  // });
+
+  const { isPending, error, loginMutation } = useLogin();
 
   const handleChangeLogin = (e) => {
     const { name, value } = e.target;
