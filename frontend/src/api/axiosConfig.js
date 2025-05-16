@@ -11,4 +11,26 @@ const axiosInstance = axios.create({
   },
 });
 
+// Thêm interceptor để gắn token vào mỗi request
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Khởi tạo token từ localStorage (nếu có) khi ứng dụng khởi động
+try {
+  const token = localStorage.getItem("token");
+  if (token) {
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+} catch (error) {
+  console.error("Error accessing localStorage:", error);
+}
+
 export default axiosInstance;

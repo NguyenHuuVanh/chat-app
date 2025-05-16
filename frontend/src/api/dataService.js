@@ -2,11 +2,22 @@ import axiosInstance from "./axiosConfig";
 
 const signup = async (signupData) => {
   const res = await axiosInstance.post("/auth/signup", signupData);
+
+  if (res.data && res.data.token) {
+    localStorage.setItem("token", res.data.token);
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+  }
   return res.data;
 };
 
 const login = async (loginData) => {
   const res = await axiosInstance.post("/auth/login", loginData);
+  // Lưu token vào localStorage
+  if (res.data && res.data.token) {
+    localStorage.setItem("token", res.data.token);
+    // Cập nhật header cho các request tiếp theo
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+  }
   return res.data;
 };
 
