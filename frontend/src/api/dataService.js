@@ -21,9 +21,25 @@ const login = async (loginData) => {
   return res.data;
 };
 
+// const logout = async () => {
+//   const res = await axiosInstance.post("/auth/logout");
+//   return res.data;
+// };
+
 const logout = async () => {
-  const res = await axiosInstance.post("/auth/logout");
-  return res.data;
+  try {
+    const res = await axiosInstance.post("/auth/logout");
+    // Xóa token khỏi localStorage
+    localStorage.removeItem("token");
+    // Xóa header Authorization
+    delete axiosInstance.defaults.headers.common["Authorization"];
+    return res.data;
+  } catch (error) {
+    console.log("Error during logout:", error);
+    localStorage.removeItem("token");
+    delete axiosInstance.defaults.headers.common["Authorization"];
+    return null; // Handle error gracefully
+  }
 };
 
 const getAuthUser = async () => {
