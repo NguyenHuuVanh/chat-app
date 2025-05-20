@@ -49,10 +49,13 @@ const signup = async (req, res) => {
     res.cookie("jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true, // prevent XSS attacks
-      sameSite: "strict", // prevent CSRF attacks
-      secure: process.env.NODE_ENV === "production", // prevent HTTP requests
+      sameSite: "none", // prevent CSRF attacks
+      // secure: process.env.NODE_ENV === "production", // prevent HTTP requests
+      secure: true,
+      path: "/",
     });
 
+    res.setHeader("Authorization", `Bearer ${token}`);
     res.status(201).json({ success: true, message: "User created successfully", user: newUser });
   } catch (error) {
     console.log("Error in signup controller:", error.message);
@@ -78,10 +81,13 @@ const login = async (req, res) => {
     res.cookie("jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true, // prevent XSS attacks
-      sameSite: "strict", // prevent CSRF attacks
-      secure: process.env.NODE_ENV === "production", // prevent HTTP requests
+      sameSite: "none", // prevent CSRF attacks
+      // secure: process.env.NODE_ENV === "production", // prevent HTTP
+      secure: true,
+      path: "/",
     });
 
+    res.setHeader("Authorization", `Bearer ${token}`);
     res.status(200).json({ success: true, message: "User logged in successfully", user, token });
   } catch (error) {
     console.log("Error in login controller:", error.message);
