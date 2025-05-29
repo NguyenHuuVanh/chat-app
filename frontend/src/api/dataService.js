@@ -27,18 +27,24 @@ const login = async (loginData) => {
 // };
 
 const logout = async () => {
+  // try {
+  //   const res = await axiosInstance.post("/auth/logout");
+  //   // Xóa token khỏi localStorage
+  //   localStorage.removeItem("token");
+  //   // Xóa header Authorization
+  //   delete axiosInstance.defaults.headers.common["Authorization"];
+  //   return res.data;
+  // } catch (error) {
+  //   console.log("Error during logout:", error);
+  //   localStorage.removeItem("token");
+  //   delete axiosInstance.defaults.headers.common["Authorization"];
+  //   return null; // Handle error gracefully
+  // }
   try {
-    const res = await axiosInstance.post("/auth/logout");
-    // Xóa token khỏi localStorage
-    localStorage.removeItem("token");
-    // Xóa header Authorization
-    delete axiosInstance.defaults.headers.common["Authorization"];
-    return res.data;
+    const response = await axiosInstance.post("/auth/logout");
+    return response.data;
   } catch (error) {
     console.log("Error during logout:", error);
-    localStorage.removeItem("token");
-    delete axiosInstance.defaults.headers.common["Authorization"];
-    return null; // Handle error gracefully
   }
 };
 
