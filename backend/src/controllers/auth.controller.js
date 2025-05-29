@@ -32,6 +32,7 @@ const signup = async (req, res) => {
       password,
       fullName,
       profilePicture: randomAvatar,
+      isOnboarded: false,
     });
 
     try {
@@ -56,7 +57,18 @@ const signup = async (req, res) => {
     });
 
     res.setHeader("Authorization", `Bearer ${token}`);
-    res.status(201).json({ success: true, message: "User created successfully", user: newUser });
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        _id: newUser._id,
+        email: newUser.email,
+        fullName: newUser.fullName,
+        profilePicture: newUser.profilePicture,
+        isOnboarded: newUser.isOnboarded || false, // Ensure isOnboarded is always a boolean
+      },
+      token,
+    });
   } catch (error) {
     console.log("Error in signup controller:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -94,11 +106,6 @@ const login = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
-// const logout = (req, res) => {
-//   res.clearCookie("jwt",{});
-//   res.status(200).json({ success: true, message: "User logged out successfully" });
-// };
 
 const logout = async (req, res) => {
   try {
