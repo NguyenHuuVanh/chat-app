@@ -95,9 +95,26 @@ const login = async (req, res) => {
   }
 };
 
-const logout = (req, res) => {
-  res.clearCookie("jwt");
-  res.status(200).json({ success: true, message: "User logged out successfully" });
+// const logout = (req, res) => {
+//   res.clearCookie("jwt",{});
+//   res.status(200).json({ success: true, message: "User logged out successfully" });
+// };
+
+const logout = async (req, res) => {
+  try {
+    // Xóa cookie jwt
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      path: "/",
+    });
+
+    res.status(200).json({ success: true, message: "User logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
 const onboard = async (req, res) => {
