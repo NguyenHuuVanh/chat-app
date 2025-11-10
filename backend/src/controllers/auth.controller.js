@@ -1,63 +1,23 @@
 import User from "../models/User.js";
 import { upsertStreamUser } from "../lib/stream.js";
 import jwt from "jsonwebtoken";
+import * as authService from "../services/auth.service.js";
+import { clearCookieToken, generateToken, setCookieToken } from "../utils/tokenUtils.js";
 
-const signup = async (req, res) => {
-  const { email, password, fullName } = req.body;
-
+export const signup = async (req, res) => {
   try {
-    if (!email || !password || !fullName) {
-      return res.status(400).json({ message: "Please fill all fields" });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists, please use a different one" });
-    }
-
-    const index = Math.floor(Math.random() * 100) + 1; // generate a random number between 1-100
-    const randomAvatar = `https://avatar.iran.liara.run/public/${index}.png`; // use the random number in the URL
-
-    const newUser = await User.create({
-      email,
-      password,
-      fullName,
-      profilePicture: randomAvatar,
-      isOnboarded: false,
-    });
-
-    try {
-      await upsertStreamUser({
-        id: newUser._id.toString(),
-        name: newUser.fullName,
-        image: newUser.profilePicture || "",
-      });
-      console.log(`Stream user created for ${newUser.fullName}`);
-    } catch (error) {
-      console.log("Error creating Stream user:", error.message);
-    }
-
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true, // prevent XSS attacks
-      sameSite: "none", // prevent CSRF attacks
-      // secure: process.env.NODE_ENV === "production", // prevent HTTP requests
-      secure: true,
-      path: "/",
-    });
-
+    const { email, password, fullName } = req.body;
+    // create user
+    const newUser = await authService.createNewUser(email, password, fullName);
+    // create token
+    const token = generateToken(newUser._id);
+    setCookieToken(res, token);
+    // set Header Authorization
     res.setHeader("Authorization", `Bearer ${token}`);
-    res.status(201).json({
+
+    res.json({
+      status: 201,
+
       success: true,
       message: "User created successfully",
       user: {
@@ -71,110 +31,169 @@ const signup = async (req, res) => {
     });
   } catch (error) {
     console.log("Error in signup controller:", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    // Handle specific errors
+    const errorMessages = {
+      MISSING_FIELDS: "Please fill all fields",
+      INVALID_EMAIL: "Invalid email format",
+      PASSWORD_TOO_SHORT: "Password must be at least 6 characters",
+      INVALID_FULLNAME: "Please provide a valid full name",
+      EMAIL_EXISTS: "Email already exists, please use a different one",
+    };
+
+    const statusCodes = {
+      MISSING_FIELDS: 400,
+      INVALID_EMAIL: 400,
+      PASSWORD_TOO_SHORT: 400,
+      INVALID_FULLNAME: 400,
+      EMAIL_EXISTS: 409,
+    };
+
+    const message = errorMessages[error.message] || "Internal server error";
+    const statusCode = statusCodes[error.message] || 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message,
+    });
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please fill all fields" });
-    }
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email" });
-    }
+    const user = await authService.authenticateUser(email, password);
 
-    const isPasswordCorrect = await user.matchPassword(password);
-    if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid password" });
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: "7d" });
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true, // prevent XSS attacks
-      sameSite: "none", // prevent CSRF attacks
-      // secure: process.env.NODE_ENV === "production", // prevent HTTP
-      secure: true,
-      path: "/",
-    });
+    const token = generateToken(user._id);
+    setCookieToken(res, token);
 
     res.setHeader("Authorization", `Bearer ${token}`);
-    res.status(200).json({ success: true, message: "User logged in successfully", user, token });
+    res.json({
+      status: 200,
+      success: true,
+      message: "User logged in successfully",
+      user: {
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        profilePicture: user.profilePicture,
+        isOnboarded: user.isOnboarded || false,
+      },
+      token,
+    });
   } catch (error) {
     console.log("Error in login controller:", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    // Handle specific errors
+    const errorMessages = {
+      MISSING_CREDENTIALS: "Please fill all fields",
+      INVALID_EMAIL: "Invalid email",
+      INVALID_PASSWORD: "Invalid password",
+    };
+
+    const statusCodes = {
+      MISSING_CREDENTIALS: 400,
+      INVALID_EMAIL: 401,
+      INVALID_PASSWORD: 401,
+    };
+
+    const message = errorMessages[error.message] || "Internal server error";
+    const statusCode = statusCodes[error.message] || 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message,
+    });
   }
 };
 
-const logout = async (req, res) => {
+export const logout = async (req, res) => {
   try {
     // Xóa cookie jwt
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      path: "/",
-    });
+    clearCookieToken(res);
 
-    res.status(200).json({ success: true, message: "User logged out successfully" });
+    res.json({
+      status: 200,
+      success: true,
+      message: "User logged out successfully",
+    });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.json({
+      status: 500,
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
-const onboard = async (req, res) => {
+export const onboard = async (req, res) => {
   try {
     const userID = req.user._id;
-    const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
+    const onBoardingData = req.body;
 
-    if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
-      return res.status(400).json({
-        message: "Please fill all fields",
-        missingFileds: [
-          !fullName && "fullName",
-          !bio && "bio",
-          !nativeLanguage && "nativeLanguage",
-          !learningLanguage && "learningLanguage",
-          !location && "location",
-        ].filter(Boolean),
+    // onBoard user
+    const updatedUser = await authService.onBoarUser(userID, onBoardingData);
+
+    if (updatedUser) {
+      return res.json({
+        status: 200,
+        success: true,
+        message: "User onboarded successfully",
+        user: updatedUser,
       });
     }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userID,
-      {
-        ...req.body,
-        isOnboarded: true,
-      },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    try {
-      await upsertStreamUser({
-        id: updatedUser._id.toString(),
-        name: updatedUser.fullName,
-        image: updatedUser.profilePicture || "",
-      });
-      console.log(`Stream user updated after onbroading for ${updatedUser.fullName}`);
-    } catch (streamError) {
-      console.log("Error updating Stream user:", streamError.message);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "User onboarded successfully",
-      user: updatedUser,
-    });
   } catch (error) {
     console.log("Error in onboard controller:", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    if (error.message === "MISSING_FIELDS") {
+      return res.json({
+        status: 400,
+        success: false,
+        message: "Please fill all fields",
+        missingFields: error.missingFields,
+      });
+    }
+
+    if (error.message === "USER_NOT_FOUND") {
+      return res.json({
+        status: 404,
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      status: 500,
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
-export { signup, login, logout, onboard };
+export const getMe = async (req, res) => {
+  try {
+    const user = req.user;
+
+    res.json({
+      status: 200,
+      success: true,
+      user: {
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        profilePicture: user.profilePicture,
+        isOnboarded: user.isOnboarded || false,
+        bio: user.bio || "",
+        location: user.location || "",
+        education: user.education || "",
+        nativeLanguage: user.nativeLanguage || "",
+        learningLanguage: user.learningLanguage || "",
+      },
+    });
+  } catch (error) {
+    console.log("Error in getMe controller:", error.message);
+    res.json({
+      status: 500,
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
