@@ -69,7 +69,7 @@ export const authenticateUser = async (email, password) => {
   }
 
   // check password
-  const isPasswordCorrect = await User.matchPassword(password);
+  const isPasswordCorrect = await user.matchPassword(password);
   if (!isPasswordCorrect) {
     throw new Error("INVALID_PASSWORD");
   }

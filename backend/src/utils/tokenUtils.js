@@ -18,7 +18,7 @@ export const setCookieToken = (res, token) => {
   res.cookie("jwt", token, {
     httpOnly: true,
     sameSite: "none",
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: "/",
   });
@@ -28,7 +28,7 @@ export const clearCookieToken = (res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
     sameSite: "none",
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     path: "/",
   });
 };
