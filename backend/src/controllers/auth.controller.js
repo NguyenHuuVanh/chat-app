@@ -1,6 +1,3 @@
-import User from "../models/User.js";
-import { upsertStreamUser } from "../lib/stream.js";
-import jwt from "jsonwebtoken";
 import * as authService from "../services/auth.service.js";
 import { clearCookieToken, generateToken, setCookieToken } from "../utils/tokenUtils.js";
 
@@ -62,6 +59,8 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await authService.authenticateUser(email, password);
+
+    console.log(user);
 
     const token = generateToken(user._id);
     setCookieToken(res, token);
