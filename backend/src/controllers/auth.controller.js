@@ -60,8 +60,6 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await authService.authenticateUser(email, password);
 
-    console.log(user);
-
     const token = generateToken(user._id);
     setCookieToken(res, token);
 

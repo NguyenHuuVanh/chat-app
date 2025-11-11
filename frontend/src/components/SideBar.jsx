@@ -51,7 +51,7 @@ const SideBar = () => {
       </nav>
 
       {/* USER PROFILE SECTION */}
-      <div className="p-4 border-t border-base-300 mt-auto cursor-pointer">
+      <Link to="/me" className="p-4 border-t border-base-300 mt-auto cursor-pointer :cursor-pointer hover:bg-base-300">
         <div className="flex items-center gap-3">
           <div className="avatar">
             <div className="w-10 rounded-full">
@@ -66,7 +66,7 @@ const SideBar = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Link>
     </aside>
   );
 };

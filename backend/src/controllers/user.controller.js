@@ -68,8 +68,9 @@ export const getRecommendedUsers = async (req, res) => {
 export const getMyFriends = async (req, res) => {
   try {
     // const user = await User.findById(req.user.id)
-    const userId = req.user._id;
+    const userId = req.user.id;
     const friends = await userService.findUserFriends(userId);
+    console.log(friends);
     // .select("friends")
     // .populate("friends", "fullName profilePicture nativeLanguage learningLanguage");
     return res.json({

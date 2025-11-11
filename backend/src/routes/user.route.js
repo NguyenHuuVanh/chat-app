@@ -21,7 +21,6 @@ router.use(protectRoute);
 
 // profile route
 router.get("/me", getMe);
-router.get("/:id", getUserProfile);
 
 // get users & friends
 router.get("/", getRecommendedUsers);
@@ -35,6 +34,9 @@ router.delete("/friend-request/:id/cancel", cancelFriendRequest);
 
 router.get("/friend-requests", getFriendRequests);
 router.get("/outgoing-friend-requests", getOutgoingFriendRequests);
+
+// get user profile by id
+router.get("/:id", getUserProfile);
 
 // remove friend
 router.delete("/friends/:id", removeFriend);

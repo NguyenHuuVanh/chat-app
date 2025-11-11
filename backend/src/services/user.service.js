@@ -13,10 +13,9 @@ export const findRecommendedUsers = async (currentUserId, currentUserFriends) =>
 };
 
 export const findUserFriends = async (userId) => {
-  const user = await User.findById(req.user.id)
+  const user = await User.findById(userId)
     .select("friends")
     .populate("friends", "fullName profilePicture nativeLanguage learningLanguage");
-
   if (!user) {
     throw new Error("User not found");
   }
@@ -43,8 +42,8 @@ export const createFriendRequest = async (senderId, recipientId) => {
   // check if request already exists
   const existingRequest = await FriendRequest.findOne({
     $or: [
-      { sender: myId, recipient: recipientId },
-      { sender: recipientId, recipient: myId },
+      { sender: senderId, recipient: recipientId },
+      { sender: recipientId, recipient: senderId },
     ],
   });
 
@@ -57,7 +56,7 @@ export const createFriendRequest = async (senderId, recipientId) => {
     sender: senderId,
     recipient: recipientId,
   });
-
+  await friendRequest.save();
   return friendRequest;
 };
 
@@ -143,7 +142,7 @@ export const rejectFriendRequestById = async (requestId, currentUserId) => {
   await FriendRequest.findByIdAndDelete(requestId);
 };
 
-export const removeFriendById = async (friendId, currentUserId) => {
+export const removeFriendById = async (currentUserId, friendId) => {
   const currentUser = await User.findById(currentUserId);
 
   if (!currentUser.friends.includes(friendId)) {
