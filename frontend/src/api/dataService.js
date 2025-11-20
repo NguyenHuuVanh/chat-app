@@ -52,6 +52,16 @@ const getAuthUser = async () => {
   }
 };
 
+const getUser = async (userId) => {
+  try {
+    const res = await axiosInstance.get(`/users/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.log("Error fetching user:", error);
+    return null; // Handle error gracefully
+  }
+};
+
 const competeOnboarding = async (userData) => {
   const res = await axiosInstance.post("/auth/onboarding", userData);
   return res.data;
@@ -87,6 +97,8 @@ const acceptFriendRequest = async (requestId) => {
   return res.data;
 };
 
+const getSuggestedFriends = async () => {};
+
 const getStreamToken = async () => {
   const res = await axiosInstance.get("/chat/token");
   return res.data;
@@ -104,5 +116,7 @@ export {
   sendFriendRequest,
   getFriendRequests,
   acceptFriendRequest,
+  getSuggestedFriends,
+  getUser,
   getStreamToken,
 };

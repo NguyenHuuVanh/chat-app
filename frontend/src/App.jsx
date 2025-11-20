@@ -13,6 +13,8 @@ import useAuthUser from "./hooks/useAuthUser";
 import Layout from "./components/Layout";
 import useThemeStore from "./store/useThemeStore";
 import MyProfile from "./pages/MyProfile";
+import FriendPage from "./pages/FriendPage";
+import UserProfile from "./pages/UserProfilePage";
 
 const App = () => {
   // tanstack query
@@ -91,6 +93,31 @@ const App = () => {
             isAuthenticated && isOnboarded ? (
               <Layout showSidebar={true}>
                 <MyProfile />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onbroading"} />
+            )
+          }
+        />
+        <Route
+          path="/friends"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <FriendPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onbroading"} />
+            )
+          }
+        />
+
+        <Route
+          path="/users/:userId"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <UserProfile />
               </Layout>
             ) : (
               <Navigate to={!isAuthenticated ? "/login" : "/onbroading"} />

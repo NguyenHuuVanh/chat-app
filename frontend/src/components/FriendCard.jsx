@@ -10,9 +10,13 @@ const FriendCard = ({ friend }) => {
           <div className="avatar size-12">
             <img src={friend.profilePicture} alt={friend.fullName} />
           </div>
-          <h3 className="font-semibold truncate">{friend.fullName}</h3>
+          <Link
+            to={`/users/${friend._id}`}
+            className="font-semibold cursor-pointer truncate hover:underline hover:text-primary"
+          >
+            {friend.fullName}
+          </Link>
         </div>
-
         <div className="flex flex-wrap gap-1.5 mb-3">
           <span className="badge badge-secondary text-xs">
             {getLanguageFlag(friend.nativeLanguage)}

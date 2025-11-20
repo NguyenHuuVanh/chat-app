@@ -107,7 +107,12 @@ const HomePage = () => {
                         </div>
 
                         <div>
-                          <h3 className="font-semibold text-lg">{user.fullName}</h3>
+                          <Link
+                            to={`/users/${user._id}`}
+                            className="font-semibold text-lg cursor-pointer hover:underline hover:text-primary"
+                          >
+                            {user.fullName}
+                          </Link>
                           {user.location && (
                             <div className="flex items-center text-xs opacity-70 mt-1">
                               <MapPinIcon className="size-3 mr-1" />
